@@ -12,3 +12,6 @@ x = np.linspace(0,1,101)
 y = solve_linear_system(0, 1, -10, 100)
 plt.plot(x,y)
 plt.show()
+
+
+test
