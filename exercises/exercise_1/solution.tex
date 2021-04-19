@@ -20,38 +20,38 @@
 \begin{enumerate}[label=(\alph*)]
   \item Input: $ a,b,k \in \mathbb{R}$
     \begin{algorithmic}[1]
-  \State load$(k)$
-  \State load$(a)$
-  \State $l_1 \gets $ mult$(a,k)$; load$(b)$
-  \State $l_2 \gets $ add$(l_1, b)$
-  \State store$(l_2)$
-\end{algorithmic}
+      \State \textbf{load}$(k)$
+      \State \textbf{load}$(a)$
+      \State $l_1 \gets $ \textbf{mult}$(a,k)$; \textbf{load}$(b)$
+      \State $l_2 \gets $ \textbf{add}$(l_1, b)$
+      \State \textbf{store}$(l_2)$
+    \end{algorithmic}
   \item Input: $ a,b \in \mathbb{R}^d$, $k \in \mathbb{R}$
     \begin{algorithmic}[1]
-      \State load$(k)$
+      \State \textbf{load}$(k)$
       \For{$i \gets 1:d$} 
-        \State load$(a_i)$
-        \State $l_{2i-1} \gets $ mult$(k, a_i)$
-        \State load$(b_i)$
-        \State $l_{2i} \gets $ add$(l_{2i-1}, b_i)$
-        \State store$(l_{2i})$
+      \State \textbf{load}$(a_i)$
+      \State $l_{2i-1} \gets $ \textbf{mult}$(k, a_i)$
+      \State \textbf{load}$(b_i)$
+      \State $l_{2i} \gets $ \textbf{add}$(l_{2i-1}, b_i)$
+      \State \textbf{store}$(l_{2i})$
       \EndFor
     \end{algorithmic}
-  Number of instructions: $5d+1$ \\
-  In particular, we have $51$ instructions for $d = 10$.
+    Number of instructions: $5d+1$ \\
+    In particular, we have $51$ instructions for $d = 10$.
   \item Input: $ a,b \in \mathbb{R}^d$, $k \in \mathbb{R}$
     \begin{algorithmic}[1]
-      \State load$(k)$
-      \State load$(a_1)$
-      \State $l_1 \gets $ mult$(k,a_1)$; load$(b_1)$
-      \State $l_2 \gets $ add$(l_1, b_1)$; load$(a_2)$
+      \State \textbf{load}$(k)$
+      \State \textbf{load}$(a_1)$
+      \State $l_1 \gets $ \textbf{mult}$(k,a_1)$; \textbf{load}$(b_1)$
+      \State $l_2 \gets $ \textbf{add}$(l_1, b_1)$; \textbf{load}$(a_2)$
       \For{$i \gets 2:(d-1)$}
-      \State $l_{2i-1} \gets $ mult$(k,a_i)$; store$(l_{2i-2})$; load$(b_i)$
-      \State $l_{2i} \gets $ add$(l_{2i-1})$; load$(a_{i+1})$
+      \State $l_{2i-1} \gets $ \textbf{mult}$(k,a_i)$; \textbf{store}$(l_{2i-2})$; \textbf{load}$(b_i)$
+      \State $l_{2i} \gets $ \textbf{add}$(l_{2i-1})$; \textbf{load}$(a_{i+1})$
       \EndFor
-      \State $l_{2d-1} \gets $ mult$(k,a_d)$; store$(l_{2d-2})$; load$(b_d)$
-      \State $l_{2i} \gets $ add$(l_{2d-1})$
-      \State store$(l_{2d})$
+      \State $l_{2d-1} \gets $ \textbf{mult}$(k,a_d)$; \textbf{store}$(l_{2d-2})$; \textbf{load}$(b_d)$
+      \State $l_{2i} \gets $ \textbf{add}$(l_{2d-1})$
+      \State \textbf{store}$(l_{2d})$
     \end{algorithmic}
     Number of instructions: $2d+3$ \\
     In particular, we have 23 instructions for $d = 10$. \\
