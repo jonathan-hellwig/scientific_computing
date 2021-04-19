@@ -1,0 +1,41 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{Scientific Computing - Exercise Sheet 2}
+\author{Jonathan Hellwig, Jule Schütt, Mika Tode, Giuliano Taccogna}
+\date{19.04.2021}
+
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{enumitem}
+\usepackage{amssymb}
+\usepackage{amsmath}
+
+\begin{document}
+
+\maketitle
+
+\section{Exercise}
+\begin{enumerate}[label=(\alph*)]
+  \item 
+    \begin{align*}
+      t^{\nu}_{total} &= 10^{-2} \cdot 10^5h + (1 - 10^{-2}) \cdot 10^5h\cdot 10^{-k} \\
+                      &= 1000h + 0.99 \cdot 10^{5-k}h
+    \end{align*}
+    \begin{tabular}{ l | c } 
+  k & $t^{\nu}_{total}$ \\
+  \hline
+  1 & 10900h \\
+  2 & 1990h  \\
+  3 & 1099h  \\
+  4 & 1009.9h  \\
+  5 & 1000.99h  \\
+\end{tabular}
+\item $S_p = \frac{t_1^N}{t_p^N} = 10^k$ \\
+  $E_p = \frac{t_1^N}{pt_p^N} = 1$
+\item $t^{\nu}_{total} = \nu t_1^N + (1-\nu)t_p^N = t_s^N + (1-\nu)\frac{t_1^N}{p} \xrightarrow[p \to \infty]{} t_s^N$
+\item $S^c_p = \frac{t_1^N}{t_p^N+t_c} = \frac{t_1^N}{\frac{t_1^N}{10k} + 10k} \xrightarrow[k \to \infty]{} 0$
+\end{enumerate}
+\end{document}
