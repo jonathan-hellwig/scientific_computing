@@ -1,0 +1,67 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{Scientific Computing - Exercise Sheet 1}
+\author{Jonathan Hellwig, Jule Schütt, Mika Tode, Giuliano Taccogna}
+\date{19.04.2021}
+
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{enumitem}
+\usepackage{amssymb}
+
+\begin{document}
+
+\maketitle
+
+\section{Exercise}
+\begin{enumerate}[label=(\alph*)]
+  \item Input: $ a,b,k \in \mathbb{R}$
+    \begin{algorithmic}[1]
+  \State load$(k)$
+  \State load$(a)$
+  \State $l_1 \gets $ mult$(a,k)$; load$(b)$
+  \State $l_2 \gets $ add$(l_1, b)$
+  \State store$(l_2)$
+\end{algorithmic}
+  \item Input: $ a,b \in \mathbb{R}^d$, $k \in \mathbb{R}$
+    \begin{algorithmic}[1]
+      \State load$(k)$
+      \For{$i \gets 1:d$} 
+        \State load$(a_i)$
+        \State $l_{2i-1} \gets $ mult$(k, a_i)$
+        \State load$(b_i)$
+        \State $l_{2i} \gets $ add$(l_{2i-1}, b_i)$
+        \State store$(l_{2i})$
+      \EndFor
+    \end{algorithmic}
+  Number of instructions: $5d+1$ \\
+  In particular, we have $51$ instructions for $d = 10$.
+  \item Input: $ a,b \in \mathbb{R}^d$, $k \in \mathbb{R}$
+    \begin{algorithmic}[1]
+      \State load$(k)$
+      \State load$(a_1)$
+      \State $l_1 \gets $ mult$(k,a_1)$; load$(b_1)$
+      \State $l_2 \gets $ add$(l_1, b_1)$; load$(a_2)$
+      \For{$i \gets 2:(d-1)$}
+      \State $l_{2i-1} \gets $ mult$(k,a_i)$; store$(l_{2i-2})$; load$(b_i)$
+      \State $l_{2i} \gets $ add$(l_{2i-1})$; load$(a_{i+1})$
+      \EndFor
+      \State $l_{2d-1} \gets $ mult$(k,a_d)$; store$(l_{2d-2})$; load$(b_d)$
+      \State $l_{2i} \gets $ add$(l_{2d-1})$
+      \State store$(l_{2d})$
+    \end{algorithmic}
+    Number of instructions: $2d+3$ \\
+    In particular, we have 23 instructions for $d = 10$. \\
+    On the optimality of the algorithm: \\
+    In total there are $1+d+d = 2d +1 $ to load into registry. Only when all values are in registry all necessary calculations can be made. Additionally, one cycle to perform the last calculation and one cycle to store the result into main memory are required. therefore, an algorithm using the proposed instruction set contains at least $(2d+1) + 1 + 1 = 2d + 3$ instructions. Thus, the proposed algorithm has minimal number of instructions for the given architecture. 
+
+    Both algorithms - parallel and serial - have a computation time that depends linearly on $d$. However, the serial algorithm has a factor of $5$ while the parallel one has a factor of $2$. Therefore, for large $d$ a significant performance increase can be achieved by the parallel algorithm.
+\end{enumerate}
+
+\bibliographystyle{plain}
+\bibliography{references}
+\end{document}
+

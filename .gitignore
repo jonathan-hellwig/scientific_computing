@@ -1,2 +1,4 @@
 slides/*
-*.pdf
+exercise-*.pdf
+*.log
+*.aux
