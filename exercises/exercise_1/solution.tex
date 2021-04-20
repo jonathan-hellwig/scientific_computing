@@ -26,7 +26,8 @@
       \State $l_2 \gets $ \textbf{add}$(l_1, b)$
       \State \textbf{store}$(l_2)$
     \end{algorithmic}
-  \item Input: $ a,b \in \mathbb{R}^d$, $k \in \mathbb{R}$
+  \item Input: $ a,b \in \mathbb{R}^d$, $k \in \mathbb{R}$\\
+  In the following we do not use the actual 'for' instruction because it is not contained in the instruction set. We just use it to clarify what's going on. 
     \begin{algorithmic}[1]
       \State \textbf{load}$(k)$
       \For{$i \gets 1:d$} 
@@ -39,7 +40,8 @@
     \end{algorithmic}
     Number of instructions: $5d+1$ \\
     In particular, we have $51$ instructions for $d = 10$.
-  \item Input: $ a,b \in \mathbb{R}^d$, $k \in \mathbb{R}$
+  \item Input: $ a,b \in \mathbb{R}^d$, $k \in \mathbb{R}$\\
+    In the following we do not use the actual 'for' instruction because it is not contained in the instruction set. We just use it to clarify what's going on. 
     \begin{algorithmic}[1]
       \State \textbf{load}$(k)$
       \State \textbf{load}$(a_1)$
@@ -61,7 +63,17 @@
     Both algorithms - parallel and serial - have a computation time that depends linearly on $d$. However, the serial algorithm has a factor of $5$ while the parallel one has a factor of $2$. Therefore, for large $d$ a significant performance increase can be achieved by the parallel algorithm.
 \end{enumerate}
 
+\section{Exercise}
+\begin{itemize}
+    \item[a)] Sketch of the $4\times 4$ ring:
+    \newpage
+    \item[b)] The network has got $4\cdot 4 =16$ processors. (Red nods.)
+    \item[c)] The bisection bandwidth is 2. (Blue cut.) There is no opportunity to split the network while cutting just one connection.
+    \item[d)] The longest communication part is 6. It is the number of hops from one 'outside' nod to the diagonal 'outside' nod. (Green path.)
+\end{itemize} 
+
+
+
 \bibliographystyle{plain}
 \bibliography{references}
 \end{document}
-
