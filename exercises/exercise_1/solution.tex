@@ -5,6 +5,8 @@
 \author{Jonathan Hellwig, Jule Schütt, Mika Tode, Giuliano Taccogna}
 \date{19.04.2021}
 
+\usepackage{float}
+\usepackage{svg}
 \usepackage{natbib}
 \usepackage{graphicx}
 \usepackage{algorithmicx}
@@ -17,17 +19,19 @@
 \maketitle
 
 \section{Exercise}
+\textbf{Notation}:
+In the following we use \textbf{for} as a short hand to simplify the notation of repeated instructions. Since \textbf{for} is not included in the instruction set each \textbf{for} is to be interpreted as a simpel repetition of all instructions inside the loop. We use $ \gets $ to denote saving values into registry that are reused in subsequent computations.
 \begin{enumerate}[label=(\alph*)]
-  \item Input: $ a,b,k \in \mathbb{R}$
+  \item \textbf{Input}: $ a,b,k \in \mathbb{R}$
     \begin{algorithmic}[1]
       \State \textbf{load}$(k)$
       \State \textbf{load}$(a)$
-      \State $l_1 \gets $ \textbf{mult}$(a,k)$; \textbf{load}$(b)$
+      \State $l_1 \gets $ \textbf{mult}$(a,k)$
+      \State \textbf{load}$(b)$
       \State $l_2 \gets $ \textbf{add}$(l_1, b)$
       \State \textbf{store}$(l_2)$
     \end{algorithmic}
-  \item Input: $ a,b \in \mathbb{R}^d$, $k \in \mathbb{R}$\\
-  In the following we do not use the actual 'for' instruction because it is not contained in the instruction set. We just use it to clarify what's going on. 
+  \item \textbf{Input}: $ a,b \in \mathbb{R}^d$, $k \in \mathbb{R}$\\
     \begin{algorithmic}[1]
       \State \textbf{load}$(k)$
       \For{$i \gets 1:d$} 
@@ -38,10 +42,9 @@
       \State \textbf{store}$(l_{2i})$
       \EndFor
     \end{algorithmic}
-    Number of instructions: $5d+1$ \\
+    \textbf{Number of instructions}: $5d+1$ \\
     In particular, we have $51$ instructions for $d = 10$.
-  \item Input: $ a,b \in \mathbb{R}^d$, $k \in \mathbb{R}$\\
-    In the following we do not use the actual 'for' instruction because it is not contained in the instruction set. We just use it to clarify what's going on. 
+  \item \textbf{Input}: $ a,b \in \mathbb{R}^d$, $k \in \mathbb{R}$\\
     \begin{algorithmic}[1]
       \State \textbf{load}$(k)$
       \State \textbf{load}$(a_1)$
@@ -55,23 +58,28 @@
       \State $l_{2i} \gets $ \textbf{add}$(l_{2d-1})$
       \State \textbf{store}$(l_{2d})$
     \end{algorithmic}
-    Number of instructions: $2d+3$ \\
-    In particular, we have 23 instructions for $d = 10$. \\
-    On the optimality of the algorithm: \\
+    \textbf{Number of instructions}: $2d+3$ \\
+    In particular, we have 23 instructions for $d = 10$. \\ \\
+    \textbf{Optimality of the algorithm}: \\
     In total there are $1+d+d = 2d +1 $ to load into registry. Only when all values are in registry all necessary calculations can be made. Additionally, one cycle to perform the last calculation and one cycle to store the result into main memory are required. therefore, an algorithm using the proposed instruction set contains at least $(2d+1) + 1 + 1 = 2d + 3$ instructions. Thus, the proposed algorithm has minimal number of instructions for the given architecture. 
 
-    Both algorithms - parallel and serial - have a computation time that depends linearly on $d$. However, the serial algorithm has a factor of $5$ while the parallel one has a factor of $2$. Therefore, for large $d$ a significant performance increase can be achieved by the parallel algorithm.
+    \textbf{Serial vs pipelined Version}: \\
+    Both algorithms - pipelined and serial - have a computation time that depends linearly on $d$. However, the serial algorithm has a factor of $5$ while the parallel one has a factor of $2$. Therefore, for large $d$ a significant performance increase can be achieved by the parallel algorithm.
 \end{enumerate}
 
 \section{Exercise}
-\begin{itemize}
-    \item[a)] Sketch of the $4\times 4$ ring:
-    \newpage
-    \item[b)] The network has got $4\cdot 4 =16$ processors. (Red nods.)
-    \item[c)] The bisection bandwidth is 2. (Blue cut.) There is no opportunity to split the network while cutting just one connection.
-    \item[d)] The longest communication part is 6. It is the number of hops from one 'outside' nod to the diagonal 'outside' nod. (Green path.)
-\end{itemize} 
+\begin{enumerate}[label=(\alph*)]
+  \item Sketch of the $4\times 4$ ring:
+    \begin{figure}[H]
+      \centering
+      \includesvg[width = 150pt]{Ring_Network}
+      \caption{Ring network}
+    \end{figure}
 
+  \item The network has got $4\cdot 4 =16$ processors. (Red nods.)
+  \item The bisection bandwidth is 2. (Blue cut.) There is no opportunity to split the network while cutting just one connection.
+  \item The longest communication part is 6. It is the number of hops from one 'outside' nod to the diagonal 'outside' nod. (Green path.)
+\end{enumerate}
 
 
 \bibliographystyle{plain}
