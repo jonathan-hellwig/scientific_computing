@@ -69,8 +69,8 @@ Therefore we have a look at the effective speedup $S_p^E$ and efficiency $E_p^E$
 \end{align*}
 Using that we compute the limit of the speedup and the efficiency:
 \begin{align*}
-    S_p &= \frac{t_1^N}{t_{total}^\nu}\xrightarrow[p \to \infty]{} \frac{t_1^N}{t_s^N}=\frac{1}{\nu}=100\\
-    E_p &= \frac{t_1^N}{pt_{total}^\nu}\xrightarrow[p \to \infty]{}0,
+    S_p^E &= \frac{t_1^N}{t_{total}^\nu}\xrightarrow[p \to \infty]{} \frac{t_1^N}{t_s^N}=\frac{1}{\nu}=100\\
+    E_p^E &= \frac{t_1^N}{pt_{total}^\nu}\xrightarrow[p \to \infty]{}0,
 \end{align*}
 where the last limit results from the convergence of $t^\nu_{total}$ to a positive number such that $pt^\nu_{total}\to\infty$ when $p\to\infty$.
 \item Now the communication time overhead $t_c$ is increasing by 1 when $p$ increases by $10$. Since we look on $p=10^k$, we can identify $t_c=\frac{p}{10}$.
