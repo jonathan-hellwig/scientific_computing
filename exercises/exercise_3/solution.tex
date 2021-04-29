@@ -1,0 +1,62 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{Scientific Computing - Exercise Sheet 1}
+\author{Jonathan Hellwig, Jule Schütt, Mika Tode, Giuliano Taccogna}
+\date{19.04.2021}
+
+\usepackage{float}
+\usepackage{svg}
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{enumitem}
+\usepackage{amssymb}
+
+\begin{document}
+
+\maketitle
+
+\section{Exercise}
+\textbf{Notation}:
+\begin{enumerate}[label=(\alph*)]
+  \item \textbf{Input}: $ \textbf{A} \in \mathbb{R}^{n\times n} \quad b, x_0\in \mathbb{R}^n$
+    \begin{algorithmic}[1]
+      \For{i = 1,2,\dots,n}
+      \State $h^{(0)} = \textbf{A}x^{(0)}$
+      \State $r^{(0)} = b - h^{(0)}$
+      \State $p^{(0)} = r^{(0)}$
+      \EndFor
+      \For{$k = 1,2,\dots$}
+      \State $\gamma_{(k-1)} = 0$ 
+      \State $\beta_{(k-1)} = 0$
+      \State $\delta_{(k-1)} = 0$
+      \State $\zeta_{(k-1)} = 0$
+
+      \State \textbf{begin parallel private($i,\gamma_{(k-1)}, \beta_{(k-1)}, \delta_{(k-1)}, \zeta_{(k-1)}$) shared($A,r^{(k-1)},p^{(k-1)},h^{(k-1)}$)}
+    \State \textbf{reduce($+:\gamma_{(k-1)}, \beta_{(k-1)}, \delta_{(k-1)}, \zeta_{(k-1)}$)}
+      \For{$i = 1,2,\dots,n$}
+      \State $h_i^{(k-1)} = \textbf{A}p_i^{(k-1)}$
+      \State $\gamma_{(k-1)} = \gamma_{(k-1)} + p_i^{(k-1)} h_i^{(k-1)}$
+      \State $\beta_{(k-1)} = \beta_{(k-1)} + r_i^{(k-1)} r_i^{(k-1)}$
+      \State $\delta_{(k-1)} = \delta_{(k-1)} + r_i^{(k-1)} h_i^{(k-1)}$
+      \State $\zeta_{(k-1)} = \zeta_{(k-1)} + h_i^{(k-1)} h_i^{(k-1)}$
+      \EndFor
+      \State \textbf{end parallel}
+      \State $\alpha_{(k-1)} = \frac{\beta^{(k-1)}}{\gamma^{(k-1)}}$
+      \State $\beta_{(k)} = \beta_{(k-1)} - 2 \alpha_{(k-1)} \delta_{(k-1)} + \alpha_{(k-1)}^2\zeta_{(k-1)}$
+      \State \textbf{begin parallel default(shared) private($i$)}
+      \For{$i = 1,2,\dots, n$}
+      \State $x_i^{(k)} = x_i^{(k-1)} + \alpha_{(k-1)}p_i^{(k-1)}$
+      \State $r_i^{(k)} = r_i^{(k-1)} - \alpha_{(k-1)}h_i^{(k-1)}$
+      \State $p_i^{(k)} = r_i^{(k)} + \frac{\beta_{(k)}}{\beta_{(k-1)}}p_i^{(k-1)}$
+      \EndFor
+      \State \textbf{end parallel}
+      \EndFor
+    \end{algorithmic}
+  \item Comment: We need a way to sum the result calculated on different processors: There needs to be a reduce operation.
+\end{enumerate} 
+\bibliographystyle{plain}
+\bibliography{references}
+\end{document}
