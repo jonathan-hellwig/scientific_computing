@@ -26,70 +26,75 @@
                         &= 1000h + 0.99 \cdot 10^{5-k}h
     \end{align*}
     \begin{center}
-    Values for different $k$:\\~\\
-\begin{tabular}{ l | c } 
-  $k$ & $t^{\nu}_{total}$ \\
-  \hline
-  1 & 10900h \\
-  2 & 1990h  \\
-  3 & 1099h  \\
-  4 & 1009.9h  \\
-  5 & 1000.99h  \\
-\end{tabular}        
+      Values for different $k$:\\~\\
+      \begin{tabular}{ l | c } 
+        $k$ & $t^{\nu}_{total}$ \\
+        \hline
+        1 & 10900h \\
+        2 & 1990h  \\
+        3 & 1099h  \\
+        4 & 1009.9h  \\
+        5 & 1000.99h  \\
+      \end{tabular}        
     \end{center}
-    
-\item The theoretical speedup and the theoretical efficiency are the following values:
-\begin{align*}
-    S_p^T &= \frac{t_1^N}{t_p^N} = 10^k,\qquad \text{for }k\in\{1,\dots,5\}\\
-    E_p^T &= \frac{t_1^N}{pt_p^N} = 1,
-\end{align*}
-where we still use $p=10^k$ for $k\in\{1,\dots,5\}.$\\
-We have to exchange the theoretical computing time $t_p^N$ where we assumed that every part of the algorithm can be parallelized with the real computing time $t_{total}^N$ which include that we can't parallelize just $99\%$ of the algorithm.
-Therefore we have a look at the effective speedup $S_p^E$ and efficiency $E_p^E$. It holds
-\begin{align*}
-     S_p^E &= \frac{t_1^N}{t_{total}^\nu}= \frac{10^5}{t_{total}^\nu} = \frac{10^5}{1000h + 0.99 \cdot 10^{5-k}h}\\
-     E_p^E &= \frac{t_1^N}{pt_{total}^\nu} = \frac{10^5}{pt_{total}^\nu} = \frac{10^5}{p(1000h + 0.99 \cdot 10^{5-k}h)}
-\end{align*}
+
+  \item The theoretical speedup and the theoretical efficiency are the following values:
+    \begin{align*}
+      S_p^T &= \frac{t_1^N}{t_p^N} = 10^k,\qquad \text{for }k\in\{1,\dots,5\}\\
+      E_p^T &= \frac{t_1^N}{pt_p^N} = 1,
+    \end{align*}
+    where we still use $p=10^k$ for $k\in\{1,\dots,5\}.$\\
+    We have to exchange the theoretical computing time $t_p^N$ where we assumed that every part of the algorithm can be parallelized with the real computing time $t_{total}^N$ which include that we can't parallelize just $99\%$ of the algorithm.
+    Therefore we have a look at the effective speedup $S_p^E$ and efficiency $E_p^E$. It holds
+    \begin{align*}
+      S_p^E &= \frac{t_1^N}{t_{total}^\nu}= \frac{10^5}{t_{total}^\nu} = \frac{10^5}{1000h + 0.99 \cdot 10^{5-k}h}\\
+      E_p^E &= \frac{t_1^N}{pt_{total}^\nu} = \frac{10^5}{pt_{total}^\nu} = \frac{10^5}{p(1000h + 0.99 \cdot 10^{5-k}h)}
+    \end{align*}
     \begin{center}
-    Values for different $k$:\\~\\
-\begin{tabular}{ l | c | c } 
-  $k$ & $S_p$ & $E_p$\\
-  \hline
-  1 &  9,17 & 0.917 \\
-  2 &  50.25 & 0.5025 \\
-  3 &  90.99 & 0.09099 \\
-  4 &  99.02 & 0.009902 \\
-  5 &  99.9 & 0.000999 \\
-\end{tabular}        
+      Values for different $k$:\\~\\
+      \begin{tabular}{ l | c | c } 
+        $k$ & $S_p$ & $E_p$\\
+        \hline
+        1 &  9,17 & 0.917 \\
+        2 &  50.25 & 0.5025 \\
+        3 &  90.99 & 0.09099 \\
+        4 &  99.02 & 0.009902 \\
+        5 &  99.9 & 0.000999 \\
+      \end{tabular}        
     \end{center}
-    
-\item It holds: 
-\begin{align*}
-    t^{\nu}_{total} = \nu t_1^N + (1-\nu)t_p^N = t_s^N + (1-\nu)\underbrace{\frac{t_1^N}{p}}_{\to 0} \xrightarrow[p \to \infty]{} t_s^N=1000.
-\end{align*}
-Using that we compute the limit of the speedup and the efficiency:
-\begin{align*}
-    S_p^E &= \frac{t_1^N}{t_{total}^\nu}\xrightarrow[p \to \infty]{} \frac{t_1^N}{t_s^N}=\frac{1}{\nu}=100\\
-    E_p^E &= \frac{t_1^N}{pt_{total}^\nu}\xrightarrow[p \to \infty]{}0,
-\end{align*}
-where the last limit results from the convergence of $t^\nu_{total}$ to a positive number such that $pt^\nu_{total}\to\infty$ when $p\to\infty$.
-\item Now the communication time overhead $t_c$ is increasing by 1 when $p$ increases by $10$. Since we look on $p=10^k$, we can identify $t_c=\frac{p}{10}$.
-It follows
-\begin{align*}
-    S^c_p = \frac{t_1^N}{t_p^N+t_c} = \frac{10^5}{\frac{10^5}{p} + \frac{p}{10}} \xrightarrow[k \to \infty]{} 0,
-\end{align*}
-where $t_1^N = 10^5$.\\
-Now we look at the speedup while insert values $p=10^k$, $k\in\{1,\dots,5\}$:
+
+  \item It holds: 
+    \begin{align*}
+      t^{\nu}_{total} = \nu t_1^N + (1-\nu)t_p^N = t_s^N + (1-\nu)\underbrace{\frac{t_1^N}{p}}_{\to 0} \xrightarrow[p \to \infty]{} t_s^N=1000.
+    \end{align*}
+    Using that we compute the limit of the speedup and the efficiency:
+    \begin{align*}
+      S_p^E &= \frac{t_1^N}{t_{total}^\nu}\xrightarrow[p \to \infty]{} \frac{t_1^N}{t_s^N}=\frac{1}{\nu}=100\\
+      E_p^E &= \frac{t_1^N}{pt_{total}^\nu}\xrightarrow[p \to \infty]{}0,
+    \end{align*}
+    where the last limit results from the convergence of $t^\nu_{total}$ to a positive number such that $pt^\nu_{total}\to\infty$ when $p\to\infty$.
+  \item Now the communication time overhead $t_c$ is increasing by 1 when $p$ increases by $10$. Since we look on $p=10^k$, we can identify $t_c=\frac{p}{10}$.
+    It follows
+    \begin{align*}
+      S^c_p = \frac{t_1^N}{t_p^N+t_c} = \frac{10^5}{\frac{10^5}{p} + \frac{p}{10}} \xrightarrow[k \to \infty]{} 0,
+    \end{align*}
+    where $t_1^N = 10^5$.\\
+    Now we look at the speedup while insert values $p=10^k$, $k\in\{1,\dots,5\}$:
     \begin{center}
-\begin{tabular}{ l | c } 
-  $k$ & $S_p^c$ \\
-  \hline
-  1 & 9.99 \\
-  2 & 99.01 \\
-  3 & 500 \\
-  4 & 99.01 \\
-  5 & 9.99 \\
-\end{tabular}        
+      \begin{tabular}{ l | c } 
+        $k$ & $S_p^c$ \\
+        \hline
+        1 & 9.99 \\
+        2 & 99.01 \\
+        3 & 500 \\
+        4 & 99.01 \\
+        5 & 9.99 \\
+      \end{tabular}        
     \end{center}
+    \begin{figure}[hbt!]
+      \centering
+      \includegraphics[width=8cm]{speedup.png}
+      \caption{Effective speedup depending on the number of rings}
+    \end{figure}
 \end{enumerate}
 \end{document}
