@@ -1,0 +1,118 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{Scientific Computing - Exercise Sheet 1}
+\author{Jonathan Hellwig, Jule Schütt, Mika Tode, Giuliano Taccogna}
+\date{19.04.2021}
+
+\usepackage{float}
+\usepackage{svg}
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{enumitem}
+\usepackage{amssymb}
+
+\begin{document}
+
+\maketitle
+
+\section{Exercise}
+\begin{enumerate}[label=(\alph*)]
+  \item \textbf{Input}: $ \textbf{A} \in \mathbb{R}^{n\times n} \quad b, x_0\in \mathbb{R}^n$
+    \begin{algorithmic}[1]
+	\State $h_{0} = \textbf{A}x_{0}$ (matrix multiplication)
+	\State $r_0 = b - h_0$ (1.1 loop)
+	\State $p_0 = r_0$
+	\For{$k = 1,2,\dots$}
+	\State $h_{k-1} = \textbf{A}p_{k-1}$ (matrix multiplication)
+	\State $\gamma_{k-1} = p^{T}_{k-1}\cdot h_{k-1}$ (2.1 loop)
+	\State $\beta_{k-1} = r^{T}_{k-1}\cdot r_{k-1}$ (2.2 loop)
+	\State $\delta_{k-1} = r^{T}_{k-1}\cdot h_{k-1}$ (2.3 loop)
+	\State $\zeta_{k-1} = h^{T}_{k-1}\cdot h_{k-1}$ (2.4 loop)
+	\State $\alpha_{k-1} = \frac{\beta^{k-1}}{\gamma^{k-1}}$
+	\State $\beta_{k} = \beta_{k-1} - 2 \alpha_{k-1} \delta_{k-1} + \alpha_{k-1}^2\zeta_{k-1}$
+	\State $x_k = x_{k-1} + \alpha_{k-1}p_{k-1}$ (2.5 loop)
+	\State $r_k = r_{k-1} - \alpha_{k-1}h_{k-1}$ (2.6 loop)
+	\State $p_k = r_{k} + \frac{\beta_k}{\beta_{k-1}}p_{k-1}$ (2.7 loop)
+	\EndFor
+    \end{algorithmic}
+All sections which are marked to be a loop can be parallelized. The minimal number of loops within the iteration loop is 2, since the loops
+2.1, 2.2, 2.3, 2.4 and the loops 2.5, 2.6, 2.7 can be summarized to one loop respectively.
+
+  \item \textbf{Input}: $ \textbf{A} \in \mathbb{R}^{n\times n} \quad b, x_0\in \mathbb{R}^n$
+    \begin{algorithmic}[1]
+	\State $h_{0} = \textbf{A}x_{0}$ (matrix multiplication)
+	\State \textbf{begin parallel private$(i, r_{0}$) shared$(b, h_{0})$}
+	\State $r_0 = b - h_0$ (1.1 loop)
+	\State \textbf{end parallel}
+	\State $p_0 = r_0$
+	\For{$k = 1,2,\dots$}
+	\State $h_{k-1} = \textbf{A}p_{k-1}$ (matrix multiplication)
+	\State \textbf{begin parallel private$(i, \gamma_{(k-1)}, \beta_{(k-1)}, \delta_{(k-1)}, \zeta_{(k-1)})$ shared$(r_{k-1},p_{k-1},h_{k-1})$}
+	\State $\gamma_{k-1} = p^{T}_{k-1}\cdot h_{k-1}$ (2.1 loop)
+	\State $\beta_{k-1} = r^{T}_{k-1}\cdot r_{k-1}$ (2.2 loop)
+	\State $\delta_{k-1} = r^{T}_{k-1}\cdot h_{k-1}$ (2.3 loop)
+	\State $\zeta_{k-1} = h^{T}_{k-1}\cdot h_{k-1}$ (2.4 loop)
+	\State \textbf{end parallel}
+	\State $\alpha_{k-1} = \frac{\beta^{k-1}}{\gamma^{k-1}}$
+	\State $\beta_{k} = \beta_{k-1} - 2 \alpha_{k-1} \delta_{k-1} + \alpha_{k-1}^2\zeta_{k-1}$
+	\State \textbf{begin parallel private$(i, x_{k}, r_{k}, p_{k})$ shared$(x_{k-1}, \alpha_{k-1}, p_{k-1}, r_{k-1}, h_{k-1},  r_{k},  \beta_{k}, \beta_{k-1})$}
+	\State $x_k = x_{k-1} + \alpha_{k-1}p_{k-1}$ (2.5 loop)
+	\State $r_k = r_{k-1} - \alpha_{k-1}h_{k-1}$ (2.6 loop)
+	\State $p_k = r_{k} + \frac{\beta_k}{\beta_{k-1}}p_{k-1}$ (2.7 loop)
+ 	\State \textbf{end parallel}
+	\EndFor
+    \end{algorithmic}
+Here $i$ denotes the counter, which is needed for the loop operation. Notice that for the Vectormultiplications in the loops 2.1, 2.2, 2.3 and 2.4 normally also a \textbf{reduce} operation should be included.
+
+  \item \textbf{Input}: $ \textbf{A} \in \mathbb{R}^{n\times n} \quad b, x_0\in \mathbb{R}^n$
+    \begin{algorithmic}[1]
+	\State $h_{0} = \textbf{A}x_{0}$ (matrix multiplication)
+	\State $r_0^{(0)} = b^{(0)} - h_0^{(0)}$ (1.1 loop)
+	\State $r_0^{(1)} = b^{(1)} - h_0^{(1)}$ (1.1 loop)
+	\State \textbf{barrier}
+	\State \textbf{send}($r_0^{(0)}$)
+	\State \textbf{recv}($r_0^{(0)}$)
+	\State \textbf{send}($r_0^{(1)}$)
+	\State \textbf{recv}($r_0^{(1)}$)
+	\State $p_0 = r_0$
+	\For{$k = 1,2,\dots$}
+	\State $h_{k-1} = \textbf{A}p_{k-1}$ (matrix multiplication)
+	\State $\gamma_{k-1}^{(0)} = p^{T(0)}_{k-1}\cdot h_{k-1}^{(0)}$ (2.1 loop)
+	\State $\gamma_{k-1}^{(1)} = p^{T(1)}_{k-1}\cdot h_{k-1}^{(1)}$ (2.1 loop)
+	\State $\beta_{k-1}^{(0)} = r^{T(0)}_{k-1}\cdot r_{k-1}^{(0)}$ (2.2 loop)
+	\State $\beta_{k-1}^{(1)} = r^{T(1)}_{k-1}\cdot r_{k-1}^{(1)}$ (2.2 loop)
+	\State $\delta_{k-1}^{(0)} = r^{T(0)}_{k-1}\cdot h_{k-1}^{(0)}$ (2.3 loop)
+	\State $\delta_{k-1}^{(1)} = r^{T(1)}_{k-1}\cdot h_{k-1}^{(1)}$ (2.3 loop)
+	\State $\zeta_{k-1}^{(0)} = h^{T(0)}_{k-1}\cdot h_{k-1}^{(0)}$ (2.4 loop)
+	\State $\zeta_{k-1}^{(1)} = h^{T(1)}_{k-1}\cdot h_{k-1}^{(1)}$ (2.4 loop)
+	\State \textbf{barrier}
+      	\State \textbf{send($\gamma_{k-1}^{(0)}, \beta_{k-1}^{(0)}, \delta_{k-1}^{(0)}, \zeta_{k-1}^{(0)}$)}
+      	\State \textbf{recv($\gamma_{k-1}^{(0)}, \beta_{k-1}^{(0)}, \delta_{k-1}^{(0)}, \zeta_{k-1}^{(0)}$)}
+	\State \textbf{send($\gamma_{k-1}^{(1)}, \beta_{k-1}^{(1)}, \delta_{k-1}^{(1)}, \zeta_{k-1}^{(1)}$)}
+      	\State \textbf{recv($\gamma_{k-1}^{(1)}, \beta_{k-1}^{(1)}, \delta_{k-1}^{(1)}, \zeta_{k-1}^{(1)}$)}
+	\State $\alpha_{k-1} = \frac{\beta^{k-1}}{\gamma^{k-1}}$
+	\State $\beta_{k} = \beta_{k-1} - 2 \alpha_{k-1} \delta_{k-1} + \alpha_{k-1}^2\zeta_{k-1}$
+	\State $x_k^{(0)} = x_{k-1}^{(0)} + \alpha_{k-1}p_{k-1}^{(0)}$ (2.5 loop)
+	\State $x_k^{(1)} = x_{k-1}^{(1)}  + \alpha_{k-1}p_{k-1}^{(1)} $ (2.5 loop)
+	\State $r_k^{(0)} = r_{k-1}^{(0)} - \alpha_{k-1}h_{k-1}^{(0)}$ (2.6 loop)
+	\State $r_k^{(1)}  = r_{k-1}^{(1)}  - \alpha_{k-1}h_{k-1}^{(1)} $ (2.6 loop)
+	\State $p_k^{(0)} = r_{k}^{(0)} + \frac{\beta_k}{\beta_{k-1}}p_{k-1}^{(0)}$ (2.7 loop)
+	\State $p_k^{(1)}  = r_{k}^{(1)}  + \frac{\beta_k}{\beta_{k-1}}p_{k-1}^{(1)} $ (2.7 loop)
+	\State \textbf{barrier}
+	\State \textbf{send($p_{k}^{(0)} $)}
+	\State \textbf{recv($p_{k}^{(0)} $)}
+	\State \textbf{send($p_{k}^{(1)} $)}
+	\State \textbf{recv($p_{k}^{(1)} $)}  	  	
+	\EndFor
+    \end{algorithmic}
+We determine that for all parallelizable parts Processor 0 works on the for-loop for $i = 1,...,n/2$ and Processor 1 works on the for-loop for $i = n/2+1,...,n$, with $n/2$ possibly rounded.
+Accordingly $v^{(j)}$ denotes a scalarproduct or a vector which is calculated by processor $j = 0, 1$. 
+If $v^{(j)}$ denotes a Vector we mean $v^{(0)} = (v(1), v(2), ..., v(n/2))^T$ and $v^{(1)} = (v(n/2+1), v(n/2+2), ..., v(n))^T$.
+If $v^{(j)}$ denotes a scalarproduct, we mean $v^{(j)} = H^{T(j)} \cdot K^{(j)}$ for $H, K \in \mathbb{R}^n$.
+If a processor recives data through the \textbf{recv} command, we implicitly include in \textbf{recv} that the recieved data is combined with the data that was calculated on the processor itself in the right way. That means if one half of a vector is recieved \textbf{recv} creates the whole vector. If "one half" of a scalarproduct is recived \textbf{recv} adds the corresponding scalarproducts to the final scalarproduct.
+If the processor is not specified in a calculation, the calculation is executed on both processors.
+\end{enumerate} 
+\end{document}
