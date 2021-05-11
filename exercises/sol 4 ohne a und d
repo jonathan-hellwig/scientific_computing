@@ -1,7 +1,7 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 
-\title{Scientific Computing - Exercise Sheet 1}
+\title{Scientific Computing - Exercise Sheet 4}
 \author{Jonathan Hellwig, Jule Schütt, Mika Tode, Giuliano Taccogna}
 \date{\today}
 
@@ -13,6 +13,7 @@
 \usepackage{algpseudocode}
 \usepackage{enumitem}
 \usepackage{amssymb}
+\usepackage{amsmath}
 
 \begin{document}
 
@@ -112,8 +113,60 @@ For the first processor (index 0):
 	\EndFor
     \end{algorithmic}
 
-\item
-
+\item To compare the performance of the algorithm of exercise sheet 3 and 4 we need to specify the paradigm. We are looking at the message passing model, so we have to consider exercise c) of both sheets.
+\\
+The CG algorithm runs for 100 seconds on one processor, i.e. 
+\begin{align*}
+    t_1^N=100.
+\end{align*}
+Thus,
+\begin{align*}
+    t_p^N=\frac{100}{p}.
+\end{align*}
+Further the communication time is given by
+\begin{align*}
+    t=0.01
+\end{align*}
+per processor and send/rec pair. We consider $p\in\{10,50,100\}$.
+\\
+We are mainly looking on the for loop in both algorithm since we don't know how many times we have to do the for loop we can not compute the serial program fraction $\nu$ in a suitable way while looking at the start part. Anyway, the for loop needs much more time and we can disregard the other part.
+\\
+For the first algorithm on exercise sheet 3 we count 2 of 9 instructions which can not be parallelized, so 
+\begin{align*}
+    \nu^1=\frac{2}{9}.
+\end{align*}
+For the second algorithm we count 1 of 7 parts which can not be parallelized, so
+\begin{align*}
+    \nu^2=\frac{1}{7}.
+\end{align*}
+Since $\nu^1>\nu^2$, we expect that the second algorithm is faster and more effective.
+\\
+The amount of pairs of send/rec can be counted: $x^1=2,\;x^2=3$. Hence, the total communication overhead is given by
+\begin{align*}
+    t^i_c=tx^ip\qquad i\in\{1,2\}.
+\end{align*}
+Finally we can compute the total run time and the speedup and efficiency by the following formulas:
+\begin{align*}
+    (t_{total}^\nu)^i&= \nu^i t_1^N +(1-\nu^i)t_p^N\\
+    S_p^i &= \frac{t_1^N}{(t_{total}^N)^i+t_c^i}\\
+    E_p^i &= \frac{t_1^N}{p((t_{total}^\nu)^i+t_c^i)}.
+\end{align*}
+We approximate the numbers to the second decimal place:
+    \begin{center}
+\begin{tabular}{ c | c | c | c } 
+  $p$ & $(t_{total}^\nu)^1$ & $S_p^1$ & $E_p^1$ \\
+  \hline
+  10    &    30             &   $3.31$  &   $ 0,33$    \\
+  50    &    $23,78$    &   $ 4.04$ &   0,08    \\
+  100   &    23             &   4           &   0,04    \\
+  \\
+  $p$ & $(t_{total}^\nu)^2$ & $S_p^2$ & $E_p^2$ \\
+  \hline
+  10    &    $22,86$    &   $ 4,32$ &      0,43 \\
+  50    &    16             &   $ 5,71$ &  0,11     \\
+  100   &    $15,14$    &   $ 5,51$ &       0,06    \\
+\end{tabular}        
+    \end{center}
 
 
 \end{enumerate} 
