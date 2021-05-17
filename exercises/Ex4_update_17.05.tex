@@ -1,0 +1,177 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{Scientific Computing - Exercise Sheet 4}
+\author{Jonathan Hellwig, Jule Schütt, Mika Tode, Giuliano Taccogna}
+\date{\today}
+
+\usepackage{float}
+\usepackage{svg}
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{enumitem}
+\usepackage{amssymb}
+\usepackage{amsmath}
+
+\begin{document}
+
+\maketitle
+
+\section{Exercise}
+\begin{enumerate}[label=(\alph*)]
+\item We have the following CG algorithm this time:\\
+
+   \textbf{Input}: $ \textbf{A} \in \mathbb{R}^{n\times n} \quad b, x_0\in \mathbb{R}^n$
+    \begin{algorithmic}[1]
+	\State $h_{0} = \textbf{A}x_{0}$ 
+	\State $r_0 = b - h_0$
+	\State $p_0 = r_0$
+	\State $\beta_0 = r_0^T\cdot r_0$
+	\For{$k = 1,2,\dots$}
+	\State $h_{k-1} = \textbf{A}p_{k-1}\qquad$ (matrix multiplication)
+	\State $\gamma_{k-1} = p^{T}_{k-1}\cdot h_{k-1}\qquad$ (1. loop)
+	\State $\alpha_{k-1} = \frac{\beta^{k-1}}{\gamma^{k-1}}$
+	\State $x_k = x_{k-1} + \alpha_{k-1}p_{k-1}\qquad$ (2. loop)
+	\State $r_k = r_{k-1} - \alpha_{k-1}h_{k-1}\qquad$ (3. loop)
+	\State $\beta_k = r_k^T\cdot r_k\qquad \qquad \qquad$ (4. loop)
+	\State $p_k = r_{k} + \frac{\beta_k}{\beta_{k-1}}p_{k-1}\qquad$ (5. loop)
+	\EndFor
+    \end{algorithmic}
+All sections marked as a loop can be parallelised as well as the lines 2 and 4 (see b)). When considering the CREW-P-RAM machine, we cannot write at the same value with more than one processor at the same time (exclusive writing). Therefore, we have to make sure that in the first and fourth loop (where a scalar is computed!) we only write with one processor.\\
+Data dependencies occur in the second, third and fifth loop, as a previous value of the one currently calculated is needed for calculation (e.g. in the second loop $x_{k-1}$ is needed for computation of $x_k$). One has to make sure not to overwrite the old value before computing the next one.
+
+
+
+\item
+  The idea is to split the vectors such that the first coordinates were computed by one processor and the last coordinates were computed by the second processor. Therefore $i$ denotes the counter, which is needed for the loop operation. Notice that for the Vectormultiplications in the loops 1 and 4 normally also a \textbf{reduce} operation should be included.
+  \\
+   \textbf{Input}: $ \textbf{A} \in \mathbb{R}^{n\times n} \quad b, x_0\in \mathbb{R}^n$
+    \begin{algorithmic}[1]
+	\State $h_{0} = \textbf{A}x_{0}$ 
+	\State \textbf{begin parallel private$(i, r_{0}$) shared$(b, h_{0})$}
+	\State $r_0 = b - h_0$
+	\State \textbf{end parallel}
+	\State $p_0 = r_0$
+	\State \textbf{begin parallel private$(i, \beta_{0}$) shared$(r_0)$}
+	\State $\beta_0 = r_0^T\cdot r_0$
+	\State \textbf{end parallel}
+	\For{$k = 1,2,\dots$}
+	\State $h_{k-1} = \textbf{A}p_{k-1}\qquad$ (matrix multiplication)
+	\State \textbf{begin parallel private$(i, \gamma_{k-1}$) shared$(p_{k-1}, h_{k-1})$}
+	\State $\gamma_{k-1} = p^{T}_{k-1}\cdot h_{k-1}\qquad$ (1. loop)
+	\State \textbf{end parallel}
+	\State $\alpha_{k-1} = \frac{\beta^{k-1}}{\gamma^{k-1}}$
+	\State \textbf{begin parallel private$(i,x_k, p_k$) shared$(r_{k-1}, r_k,x_{k-1}, h_{k-1},\alpha_{k-1},\beta_k, \beta_{k-1}, p_{k-1})$}
+	\State $x_k = x_{k-1} + \alpha_{k-1}p_{k-1}\qquad$ (2 loop)
+	\State $r_k = r_{k-1} - \alpha_{k-1}h_{k-1}\qquad$ (3. loop)
+	\State $\beta_k = r_k^T\cdot r_k\qquad \qquad \qquad$ (4. loop)
+	\State $p_k = r_{k} + \frac{\beta_k}{\beta_{k-1}}p_{k-1}\qquad$ (5. loop)
+	\State \textbf{end parallel}
+	\EndFor
+    \end{algorithmic}
+
+
+\item
+We determine that for all parallelizable parts Processor 0 works on the for-loop for $i = 1,...,n/2$ and Processor 1 works on the for-loop for $i = n/2+1,...,n$, with $n/2$ possibly rounded.\\
+Accordingly $v^{(j)}$ denotes a scalarproduct or a vector which is calculated by processor $j = 0, 1$. 
+If $v^{(j)}$ denotes a Vector we mean $v^{(0)} = (v(1), v(2), ..., v(n/2))^T$ and $v^{(1)} = (v(n/2+1), v(n/2+2), ..., v(n))^T$.
+If $v^{(j)}$ denotes a scalarproduct, we mean $v^{(j)} = H^{T(j)} \cdot K^{(j)}$ for $H, K \in \mathbb{R}^n$.\\
+If a processor recives data through the \textbf{recv} command, we implicitly include in \textbf{recv} that the recieved data is combined with the data that was calculated on the processor itself in the right way. \\
+That means if one half of a vector $v^{(i)}$ is recieved \textbf{recv} creates the whole vector $v=[v^{(0)}, v^{(1)}]$. If "one half" of a scalarproduct is recived \textbf{recv} adds the corresponding scalarproducts to the final scalarproduct:  $v=v^{(0)}+ v^{(1)}$.
+If the processor is not specified in a calculation, the calculation is executed on both processors.
+\\
+For the first processor (index 0):
+\\
+   \textbf{Input}: $ \textbf{A} \in \mathbb{R}^{n\times n} \quad b, x_0\in \mathbb{R}^n$
+    \begin{algorithmic}[1]
+	\State $h_{0} = \textbf{A}x_{0}$ 
+	\State $r^{(0)}_0 = b^{(0)} - h_0^{(0)}$
+	\State \textbf{barrier}
+	\State \textbf{send}($r_0^{(0)}$)
+	\State \textbf{recv}($r_0^{(1)}$)
+	\State $p_0 = r_0$
+	\State $\beta_0^{(0)} = r^{(0)T}_0\cdot r^{(0)}_0$
+		\State \textbf{barrier}
+	\State \textbf{send}($\beta_0^{(0)}$)
+	\State \textbf{recv}($\beta_0^{(1)}$)
+	\For{$k = 1,2,\dots$}
+	\State $h_{k-1} = \textbf{A}p_{k-1}\qquad$ (matrix multiplication)
+	\State $\gamma^{(0)}_{k-1} = (p^{(0)}_{k-1})^T\cdot h^{(0)}_{k-1}\qquad$ (1. loop)
+			\State \textbf{barrier}
+	\State \textbf{send}($\gamma_{k-1}^{(0)}$)
+	\State \textbf{recv}($\gamma_{k-1}^{(1)}$)
+	\State $\alpha_{k-1} = \frac{\beta^{k-1}}{\gamma^{k-1}}$
+	\State $x^{(0)}_k = x^{(0)}_{k-1} + \alpha^{(0)}_{k-1}p^{(0)}_{k-1}\qquad$ (2 loop)
+	\State $r^{(0)}_k = r^{(0)}_{k-1} - \alpha^{(0)}_{k-1}h^{(0)}_{k-1}\qquad$ (3. loop)
+	\State $\beta^{(0)}_k = (r^{(0)}_k)^T\cdot r^{(0)}_k\qquad \qquad $ (4. loop)
+				\State \textbf{barrier}
+	\State \textbf{send}($\beta_k^{(0)}$)
+	\State \textbf{recv}($\beta_k^{(1)}$)
+	\State $p^{(0)}_k = r^{(0)}_{k} + \frac{\beta^{(0)}_k}{\beta^{(0)}_{k-1}}p_{k-1}\qquad$ (5. loop)
+					\State \textbf{barrier}
+	\State \textbf{send}($p_k^{(0)}$)
+	\State \textbf{recv}($p_k^{(1)}$)
+	\EndFor
+    \end{algorithmic}
+
+\item To compare the performance of the algorithm of exercise sheet 3 and 4 we need to specify the paradigm. We are looking at the message passing model, so we have to consider exercise c) of both sheets.
+\\
+The CG algorithm runs for 100 seconds on one processor, i.e. 
+\begin{align*}
+    t_1^N=100.
+\end{align*}
+Thus,
+\begin{align*}
+    t_p^N=\frac{100}{p}.
+\end{align*}
+Further the communication time is given by
+\begin{align*}
+    t=0.01
+\end{align*}
+per processor and send/rec pair. We consider $p\in\{10,50,100\}$.
+\\
+We are mainly looking on the for loop in both algorithm since we don't know how many times we have to do the for loop we can not compute the serial program fraction $\nu$ in a suitable way while looking at the start part. Anyway, the for loop needs much more time and we can disregard the other part.
+\\
+For the first algorithm on exercise sheet 3 we count 2 of 9 instructions which can not be parallelized, so 
+\begin{align*}
+    \nu^1=\frac{2}{9}.
+\end{align*}
+For the second algorithm we count 1 of 7 parts which can not be parallelized, so
+\begin{align*}
+    \nu^2=\frac{1}{7}.
+\end{align*}
+Since $\nu^1>\nu^2$, we expect that the second algorithm is faster and more effective.
+\\
+The amount of pairs of send/rec can be counted: $x^1=2,\;x^2=3$. Hence, the total communication overhead is given by
+\begin{align*}
+    t^i_c=tx^ip\qquad i\in\{1,2\}.
+\end{align*}
+Finally we can compute the total run time and the speedup and efficiency by the following formulas:
+\begin{align*}
+    (t_{total}^\nu)^i&= \nu^i t_1^N +(1-\nu^i)t_p^N\\
+    S_p^i &= \frac{t_1^N}{(t_{total}^N)^i+t_c^i}\\
+    E_p^i &= \frac{t_1^N}{p((t_{total}^\nu)^i+t_c^i)}.
+\end{align*}
+We approximate the numbers to the second decimal place:
+    \begin{center}
+\begin{tabular}{ c | c | c | c } 
+  $p$ & $(t_{total}^\nu)^1$ & $S_p^1$ & $E_p^1$ \\
+  \hline
+  10    &    30             &   $3.31$  &   $ 0,33$    \\
+  50    &    $23,78$    &   $ 4.04$ &   0,08    \\
+  100   &    23             &   4           &   0,04    \\
+  \\
+  $p$ & $(t_{total}^\nu)^2$ & $S_p^2$ & $E_p^2$ \\
+  \hline
+  10    &    $22,86$    &   $ 4,32$ &      0,43 \\
+  50    &    16             &   $ 5,71$ &  0,11     \\
+  100   &    $15,14$    &   $ 5,51$ &       0,06    \\
+\end{tabular}        
+    \end{center}
+
+The second algorithm needs a smaller computing time (total run time) throughout the different numbers of processors compared to the first algorithm, which aligns with our expectation and the fact that a larger fraction of the second algorithm can be parallelized. Furthermore, the effective speedup and efficieny for the second algorithm is larger than the effective speedup and efficiency values for Algorithm 1 for each number of processors p.\\
+As we have seen on the second exercise sheet, adding more and more processors does not always increase effective speedup and efficiency infinitely, e.g. for $p=50$ we have a higher speedup in both algorithms compared to their respective speedup and efficiency values for $p=100$.
+\end{enumerate} 
+\end{document}
