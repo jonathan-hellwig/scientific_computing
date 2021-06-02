@@ -1,0 +1,57 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{Scientific Computing - Exercise Sheet 4}
+\author{Jonathan Hellwig, Jule Schütt, Mika Tode, Giuliano Taccogna}
+\date{\today}
+
+\usepackage{float}
+\usepackage{svg}
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{enumitem}
+\usepackage{amssymb}
+\usepackage{amsmath}
+
+\begin{document}
+
+\maketitle
+
+\section{Exercise 1}
+\begin{enumerate}[label=(\alph*)]
+    \item Sketch of the mesh and the computational pattern:
+    \newpage
+    
+    \item
+    We will describe the average cache load for computing the next Laplace smoothing. The cache line length is 8 and we assume that if one data has been accessed, the following 7 entries were loaded instantly. That means if we load the third item, we loaded item 3 to item 10 in our cache. \\
+    We will describe 3 different item positions
+    \begin{itemize}
+        \item Interior items:\\
+    If we look on the sketch and choose one interior item $m$ of the mesh, we see that if we load the item above ($m-1$), then we always have load the item below ($m+1$), too. But the left item has the number $m-16$ and the right item has the number $m+16$. Thus, we have to load them separately. 
+    \item Corner items:\\
+    If we look on an corner item, we have one neighbour to the left or to the right and one neighbour above or below. with the same explanation as above it follows that we have to load two caches for the computation.
+    
+    \item Boundary items that were no corner items:\\
+    If we look at an item on the side and not on the corner, there exists either 2 side neighbours (if we are at the top or at the bottom) and one neighbour above or below such that we have to load 3 caches.
+    \\
+    If the item is on the left or on the right side, there are two neighbours above and below and one neighbour either to the left or to the right. Then we have to load 2 caches.
+    \end{itemize}
+    There are 14 times 14 interior points, 4 corner points, 14 left side points as well as 14 right/bottom/top side point. All in all the average number of cache loads per computation is:
+    \begin{align*}
+        \frac{14\cdot14\cdot3+4\cdot2+14\cdot3+14\cdot3+14\cdot2+14\cdot2}{16\cdot16}=\frac{23}{8} = 2,875
+    \end{align*}
+    
+    
+
+\end{enumerate}
+\section{Exercise 2}
+\begin{enumerate}[label=(\alph*)]
+    
+    
+    
+
+
+\end{enumerate}
+\end{document}
