@@ -9,6 +9,7 @@
 \usepackage{svg}
 \usepackage{natbib}
 \usepackage{graphicx}
+\usepackage{caption}
 \usepackage{algorithmicx}
 \usepackage{algpseudocode}
 \usepackage{enumitem}
@@ -42,16 +43,57 @@
     \begin{align*}
         \frac{14\cdot14\cdot3+4\cdot2+14\cdot3+14\cdot3+14\cdot2+14\cdot2}{16\cdot16}=\frac{23}{8} = 2,875
     \end{align*}
+
+    \item Sketch of the mesh which results from the Cuthill-McKee algorithm:
     
+    \newpage
+    
+    \item 
     
 
 \end{enumerate}
 \section{Exercise 2}
 \begin{enumerate}[label=(\alph*)]
-    
-    
-    
 
+    \item The connectivity matrix $C\in\mathbb N^{10\times 10}$ of the mesh is the following:
+    \begin{align*}
+        C=\left[\begin{matrix}
+            1 & 1 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0\\
+            1 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 1\\
+            0 & 1 & 1 & 1 & 0 & 1 & 0 & 1 & 0 & 0\\
+            1 & 0 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 0\\
+            0 & 0 & 0 & 1 & 1 & 1 & 0 & 0 & 0 & 0\\
+            0 & 0 & 1 & 0 & 1 & 1 & 1 & 0 & 0 & 0\\
+            0 & 0 & 0 & 0 & 0 & 1 & 1 & 1 & 0 & 0\\
+            0 & 0 & 1 & 0 & 0 & 0 & 1 & 1 & 1 & 0\\
+            0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1 & 1\\
+            0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 1\\
+        \end{matrix}\right]
+    \end{align*}
+\newpage
+    \item Hier fehlt noch etwas text...
+    
+    \begin{figure}[h]
+    \centering
+     \includegraphics[scale=0.3]{erste Zerlegung}
+    \caption{Erste Zerlegung}
+    \label{fig:meine-grafik}
+    \end{figure}
+
+    \begin{figure}[h]
+    \centering
+     \includegraphics[scale=0.3]{zweite Zerlegung}
+    \caption{Zweite Zerlegung}
+    \label{fig:meine-grafik}
+    \end{figure}
+    
+    \begin{figure}[h]
+    \centering
+     \includegraphics[scale=0.3]{dritte Zerlegung}
+    \caption{Dritte Zerlegung}
+    \label{fig:meine-grafik}
+    \end{figure}
+    
 
 \end{enumerate}
 \end{document}
