@@ -23,8 +23,7 @@
 
 \section{Exercise 1}
 \begin{enumerate}[label=(\alph*)]
-    \item Sketch of the mesh and the computational pattern:
-	    \begin{align*}
+    \item Sketch of the mesh and the computational pattern:	    \begin{align*}
         C=\left[\begin{matrix}
             1 & 17 & 33 & 49 & ...\\
             2 & 18 & 34 & 50 & ... \\
@@ -42,7 +41,7 @@
 	14 & 30 & 46 & 62  & ... \\
 	15 & 31 & 47 & 63  & ... \\
 	16 & 32 & 48 & 64  & ... 
-        \end{matrix}\right]
+        \end{matrix}\right]\in\mathbb N^{16\times 16}
     \end{align*}
 The computational pattern for grid point 21 is given by the fat numbers.    
     \item
@@ -67,21 +66,21 @@ The computational pattern for grid point 21 is given by the fat numbers.
     \item Sketch of the mesh which results from the Cuthill-McKee algorithm:
 		    \begin{align*}
         C=\left[\begin{matrix}
-          ... & ...  & ... & ... & ... &... & ... & ...\\
-         27 & ...  & ... & ... & ... &... & ... & ...\\
-	20 & 26 & ...  & ... & ... & ... &... & ...\\
-	14 & 19 & 25 & ...  & ... & ... & ... & ...\\
-	9 & 13 & 18 & 24  & ... & ... &... & ...\\
-	5 & 8 & 12 & 17 & 23  & ... &... & ...\\
-	2 & 4 & 7 & 11  & 16 & 22 & ... & ...\\
-	0 & 1 & 3 & 6 & 10  & 15 & 21 & ... 
-        \end{matrix}\right]
+	1 & 3 & 6 & 10 & 15  & 21 & 28 & ...   \\      
+ 	2 & 5 & 9 & 14  & 20  & 27 & ... & ...\\      
+	4 & 8 & 13 & 19 & 26  & ... &... & ...\\ 	
+	7 & 12 & 18 & 25  & ... & ... &... & ...\\ 	
+	11 & 17 & 24 & ...  & ... & ... & ... & ...\\ 	
+ 	16 & 23 & ...  & ... & ... & ... &... & ...\\	
+    22 & ...  & ... & ... & ... &... & ... & ...\\
+    ... & ...  & ... & ... & ... &... & ... & ...\\
+        \end{matrix}\right]\in \mathbb N ^{16\times 16}
     \end{align*}
     
     \item 
- As one can see from the sketch if we look at interior item $x_{i,j}$, we need one cache line load to access te data value corrseponding to grid point $x_{i,j-1}$ (below),  this load gives the processor also access to the data value corresponding to grid point $x_{i-1,j}$ (on the left). The same holds for the grid points $x_{i+1,j}$ (on the right) and $x_{i,j+1}$ (above). That means 2 cache line loads are necessary for the 14 times 14 inner grid points.
+ As one can see from the sketch if we look at interior item $x_{i,j}$, we need one cache line load to access te data value corrseponding to grid point $x_{i-1,j}$ (left), this load gives the processor also access to the data value corresponding to grid point $x_{i,j-1}$ (above). The same holds for the grid points $x_{i,j+1}$ (below) and $x_{i+1,j}$ (right). That means 2 cache line loads are necessary for the 14 times 14 inner grid points.
 \newline
-For the 60 boundary and corner grid points at most 2 cache line loads are needed. But for example for the point 0 or 1 only one cache line load is necessary.
+For the 60 boundary and corner grid points at most 2 cache line loads are needed. But for example for the point 1 or 2 only one cache line load is necessary.
 \newline
 That means the average number of cache line loads is smaller than, but close to 2. 
 \newpage
